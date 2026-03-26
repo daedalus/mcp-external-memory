@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "you@example.com"}
+    {name = "Daniel Clavijo", email = "dclavijo@example.com"}
 ]
 dependencies = [
     "mcp>=1.4.0",
@@ -47,9 +47,9 @@ cli = [
 mcp-external-memory = "mcp_external_memory.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/your-name/mcp-external-memory"
-Repository = "https://github.com/your-name/mcp-external-memory"
-Issues = "https://github.com/your-name/mcp-external-memory/issues"
+Homepage = "https://github.com/daedalus/mcp-external-memory"
+Repository = "https://github.com/daedalus/mcp-external-memory"
+Issues = "https://github.com/daedalus/mcp-external-memory/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_external_memory"]
@@ -75,8 +75,6 @@ convention = "google"
 [tool.mypy]
 python_version = "3.11"
 strict = true
-src = ["src"]
-tests = ["tests"]
 warn_return_any = true
 warn_unused_ignores = true
 ignore_missing_imports = true

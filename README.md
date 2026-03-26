@@ -4,6 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/mcp-external-memory.svg)](https://pypi.org/project/mcp-external-memory/)
 [![Python](https://img.shields.io/pypi/pyversions/mcp-external-memory.svg)](https://pypi.org/project/mcp-external-memory/)
+[![Coverage](https://codecov.io/gh/daedalus/mcp-external-memory/branch/main/graph/badge.svg)](https://codecov.io/gh/daedalus/mcp-external-memory)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 ## Install
@@ -57,7 +58,7 @@ Set via `MEMORY_EMBED_BACKEND` environment variable.
 ## Development
 
 ```bash
-git clone https://github.com/your-name/mcp-external-memory.git
+git clone https://github.com/daedalus/mcp-external-memory.git
 cd mcp-external-memory
 pip install -e ".[test]"
 
@@ -73,3 +74,7 @@ ruff check src/ tests/
 # type check
 mypy src/
 ```
+
+## MCP Registry
+
+mcp-name: io.github.daedalus/mcp-external-memory

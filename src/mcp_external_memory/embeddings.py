@@ -201,7 +201,7 @@ class TFIDFEmbedder(EmbeddingProvider):
         texts = self._store.all_texts()
         n = len(texts) or 1
         df: Counter[str] = Counter()
-        for t in texts:
+        for t in texts:  # type: ignore[attr-defined]
             df.update(set(_tokenize(t)))
         return {w: math.log((n + 1) / (cnt + 1)) + 1 for w, cnt in df.items()}
 

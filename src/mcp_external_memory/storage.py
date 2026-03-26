@@ -7,16 +7,17 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import lz4.frame
 
 
 def _compress(data: str) -> bytes:
-    return lz4.frame.compress(data.encode("utf-8"))
+    return lz4.frame.compress(data.encode("utf-8"))  # type: ignore[no-any-return]
 
 
 def _decompress(data: bytes) -> str:
-    return lz4.frame.decompress(data).decode("utf-8")
+    return lz4.frame.decompress(data).decode("utf-8")  # type: ignore[no-any-return]
 
 
 DB_PATH = Path(os.environ.get("MEMORY_DB_PATH", "~/.semantic_memory.db")).expanduser()
@@ -47,12 +48,12 @@ class MemoryEntry:
     namespace: str = "default"
     tags: list[str] = field(default_factory=list)
     embedding: list[float] | None = None
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     created_at: float | None = None
     updated_at: float | None = None
     access_count: int = 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Convert MemoryEntry to dictionary representation.
 
         Returns:
@@ -206,7 +207,7 @@ class MemoryStore:
             results = [r for r in results if tag_set & set(r.tags)]
         return results
 
-    def all_texts(self) -> list[str]:
+    def all_texts(self) -> list[str]:  # type: ignore[valid-type]
         """Get all text content from stored memories.
 
         Returns:
@@ -215,7 +216,7 @@ class MemoryStore:
         rows = self._conn.execute("SELECT content FROM memories").fetchall()
         return [_decompress(r["content"]) for r in rows]
 
-    def all_with_embeddings(self) -> list[tuple[str, list[float], MemoryEntry]]:
+    def all_with_embeddings(self) -> list[tuple[str, list[float], MemoryEntry]]:  # type: ignore[valid-type]
         """Get all memories that have embeddings.
 
         Returns:
@@ -238,7 +239,7 @@ class MemoryStore:
         """
         return self._conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]  # type: ignore[no-any-return]
 
-    def stats(self) -> dict[str, object]:
+    def stats(self) -> dict[str, Any]:
         """Get statistics about the memory store.
 
         Returns:

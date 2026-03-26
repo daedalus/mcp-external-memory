@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import uuid
 from contextlib import asynccontextmanager
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from mcp.server.fastmcp import FastMCP
 
@@ -46,9 +46,9 @@ async def memory_store(
     content: str,
     namespace: str = "default",
     tags: list[str] | None = None,
-    metadata: dict | None = None,
+    metadata: dict[str, Any] | None = None,
     id: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """
     Persist a piece of information to long-term semantic memory.
 
@@ -85,7 +85,7 @@ async def memory_search(
     tags: list[str] | None = None,
     top_k: int = TOP_K,
     min_score: float = SCORE_MIN,
-) -> dict:
+) -> dict[str, Any]:
     """
     Semantic search over stored memories.
 
@@ -108,7 +108,7 @@ async def memory_search(
     qemb = await app_ctx.embedding_provider.generate(query)
 
     scored: list[tuple[float, MemoryEntry]] = []
-    for mid, emb, entry in candidates:
+    for mid, emb, entry in candidates:  # type: ignore[attr-defined]
         if namespace and entry.namespace != namespace:
             continue
         if tags and not (set(tags) & set(entry.tags)):
@@ -128,7 +128,7 @@ async def memory_search(
 
 
 @mcp.tool()
-async def memory_get(id: str) -> dict:
+async def memory_get(id: str) -> dict[str, Any]:
     """
     Retrieve a specific memory by its ID.
 
@@ -145,7 +145,7 @@ async def memory_get(id: str) -> dict:
 
 
 @mcp.tool()
-async def memory_delete(id: str) -> dict:
+async def memory_delete(id: str) -> dict[str, Any]:
     """
     Delete a memory by its ID.
 
@@ -165,7 +165,7 @@ async def memory_list(
     tags: list[str] | None = None,
     limit: int = 50,
     offset: int = 0,
-) -> dict:
+) -> dict[str, Any]:
     """
     List stored memories, optionally filtered by namespace or tags.
 
@@ -185,7 +185,7 @@ async def memory_list(
 
 
 @mcp.tool()
-async def memory_stats() -> dict:
+async def memory_stats() -> dict[str, Any]:
     """
     Return memory store statistics: total memories, namespace counts, DB path.
     """
@@ -201,8 +201,8 @@ async def memory_update(
     content: str | None = None,
     namespace: str | None = None,
     tags: list[str] | None = None,
-    metadata: dict | None = None,
-) -> dict:
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """
     Update an existing memory's content, namespace, tags, and/or metadata.
 
@@ -237,7 +237,7 @@ async def memory_update(
 def main() -> int:
     transport = os.getenv("MCP_TRANSPORT", "stdio")
     if transport == "streamable-http":
-        mcp.run(transport="streamable-http", host="0.0.0.0", port=8080)
+        mcp.run(transport="streamable-http", host="0.0.0.0", port=8080)  # type: ignore[call-arg]
     elif transport == "sse":
         mcp.run(transport="sse")
     else:
