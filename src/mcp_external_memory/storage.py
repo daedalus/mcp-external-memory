@@ -8,16 +8,27 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import lz4.frame
+
+
+def _compress(data: str) -> bytes:
+    return lz4.frame.compress(data.encode("utf-8"))
+
+
+def _decompress(data: bytes) -> str:
+    return lz4.frame.decompress(data).decode("utf-8")
+
+
 DB_PATH = Path(os.environ.get("MEMORY_DB_PATH", "~/.semantic_memory.db")).expanduser()
 
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS memories (
     id          TEXT PRIMARY KEY,
-    content     TEXT NOT NULL,
+    content     BLOB NOT NULL,
     namespace   TEXT NOT NULL DEFAULT 'default',
     tags        TEXT NOT NULL DEFAULT '[]',
-    embedding   TEXT NOT NULL DEFAULT '[]',
+    embedding   BLOB NOT NULL,
     metadata    TEXT NOT NULL DEFAULT '{}',
     created_at  REAL NOT NULL,
     updated_at  REAL NOT NULL,
@@ -76,10 +87,10 @@ class MemoryStore:
                  updated_at=excluded.updated_at""",
             (
                 entry.id,
-                entry.content,
+                _compress(entry.content),
                 entry.namespace,
                 json.dumps(entry.tags),
-                json.dumps(entry.embedding or []),
+                _compress(json.dumps(entry.embedding or [])),
                 json.dumps(entry.metadata),
                 entry.created_at or now,
                 now,
@@ -106,10 +117,10 @@ class MemoryStore:
                content=?, namespace=?, tags=?, embedding=?, metadata=?, updated_at=?
                WHERE id=?""",
             (
-                entry.content,
+                _compress(entry.content),
                 entry.namespace,
                 json.dumps(entry.tags),
-                json.dumps(entry.embedding or []),
+                _compress(json.dumps(entry.embedding or [])),
                 json.dumps(entry.metadata),
                 now,
                 entry.id,
@@ -148,15 +159,17 @@ class MemoryStore:
 
     def all_texts(self) -> list[str]:
         rows = self._conn.execute("SELECT content FROM memories").fetchall()
-        return [r["content"] for r in rows]
+        return [_decompress(r["content"]) for r in rows]
 
     def all_with_embeddings(self) -> list[tuple[str, list[float], MemoryEntry]]:
         rows = self._conn.execute("SELECT * FROM memories").fetchall()
-        return [
-            (r["id"], json.loads(r["embedding"]), self._row_to_entry(r))
-            for r in rows
-            if json.loads(r["embedding"])
-        ]
+        result: list[tuple[str, list[float], MemoryEntry]] = []
+        for r in rows:
+            emb_bytes = r["embedding"]
+            if emb_bytes:
+                emb = json.loads(_decompress(emb_bytes))
+                result.append((r["id"], emb, self._row_to_entry(r)))
+        return result
 
     def count(self) -> int:
         return self._conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]  # type: ignore[no-any-return]
@@ -176,10 +189,10 @@ class MemoryStore:
     def _row_to_entry(row: sqlite3.Row) -> MemoryEntry:
         return MemoryEntry(
             id=row["id"],
-            content=row["content"],
+            content=_decompress(row["content"]),
             namespace=row["namespace"],
             tags=json.loads(row["tags"]),
-            embedding=json.loads(row["embedding"]),
+            embedding=json.loads(_decompress(row["embedding"])),
             metadata=json.loads(row["metadata"]),
             created_at=row["created_at"],
             updated_at=row["updated_at"],
