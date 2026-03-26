@@ -51,6 +51,7 @@ An MCP server that gives LLMs persistent, searchable semantic memory using SQLit
 ## Data Formats
 
 - **Database**: SQLite with table `memories` (id, content, namespace, tags, embedding, metadata, created_at, updated_at, access_count)
+- **Compression**: Content and embeddings stored with LZ4 compression to reduce storage size
 - **Embeddings**: JSON-serialized list of floats in SQLite
 - **Tags/Metadata**: JSON-serialized lists/dicts
 
