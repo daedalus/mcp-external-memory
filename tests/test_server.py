@@ -1,13 +1,15 @@
 import pytest
 
-from mcp_external_memory.server import (
-    MemoryEntry,
-    MemoryStore,
+from mcp_external_memory.embeddings import (
     TFIDFEmbedder,
     _cosine,
     _cosine_dense,
     _tfidf_vector,
     _tokenize,
+)
+from mcp_external_memory.storage import (
+    MemoryEntry,
+    MemoryStore,
 )
 
 
@@ -264,7 +266,7 @@ class TestTFIDFEmbedder:
     @pytest.mark.asyncio
     async def test_generate_returns_list(self, embedder, store):
         # Add some content first so IDF is non-empty
-        from mcp_external_memory.server import MemoryEntry
+        from mcp_external_memory.storage import MemoryEntry
 
         store.add(MemoryEntry(content="test content for embedding"))
         result = await embedder.generate("test text")
@@ -273,7 +275,7 @@ class TestTFIDFEmbedder:
 
     @pytest.mark.asyncio
     async def test_generate_empty_text(self, embedder, store):
-        from mcp_external_memory.server import MemoryEntry
+        from mcp_external_memory.storage import MemoryEntry
 
         store.add(MemoryEntry(content="some content"))
         result = await embedder.generate("")
@@ -281,7 +283,7 @@ class TestTFIDFEmbedder:
 
     @pytest.mark.asyncio
     async def test_generate_same_text_same_embedding(self, embedder, store):
-        from mcp_external_memory.server import MemoryEntry
+        from mcp_external_memory.storage import MemoryEntry
 
         store.add(MemoryEntry(content="hello world content"))
         result1 = await embedder.generate("hello world")
@@ -290,12 +292,11 @@ class TestTFIDFEmbedder:
 
     @pytest.mark.asyncio
     async def test_generate_different_text_different_embedding(self, embedder, store):
-        from mcp_external_memory.server import MemoryEntry
+        from mcp_external_memory.storage import MemoryEntry
 
         store.add(MemoryEntry(content="test content"))
-        result1 = await embedder.generate("hello world")
-        result2 = await embedder.generate("foo bar")
-        # Note: May be same if vocab is empty
+        await embedder.generate("hello world")
+        await embedder.generate("foo bar")
 
 
 class TestEdgeCases:
