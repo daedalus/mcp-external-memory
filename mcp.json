@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-external-memory": {
+      "command": "mcp-external-memory",
+      "env": {}
+    }
+  }
+}

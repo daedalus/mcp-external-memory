@@ -1,0 +1,38 @@
+__version__ = "0.1.0"
+__all__ = [
+    "MemoryStore",
+    "MemoryEntry",
+    "EmbeddingProvider",
+    "TFIDFEmbedder",
+    "OpenAIEmbedder",
+    "OllamaEmbedder",
+    "create_embedding_provider",
+    "mcp",
+    "memory_store",
+    "memory_search",
+    "memory_get",
+    "memory_delete",
+    "memory_list",
+    "memory_stats",
+    "memory_update",
+    "main",
+]
+
+from .server import (
+    EmbeddingProvider,
+    MemoryEntry,
+    MemoryStore,
+    OllamaEmbedder,
+    OpenAIEmbedder,
+    TFIDFEmbedder,
+    create_embedding_provider,
+    main,
+    mcp,
+    memory_delete,
+    memory_get,
+    memory_list,
+    memory_search,
+    memory_stats,
+    memory_store,
+    memory_update,
+)
