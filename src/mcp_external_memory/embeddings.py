@@ -102,16 +102,57 @@ _STOPWORDS = {
 
 
 def _tokenize(text: str) -> list[str]:
+    """Tokenize text into lowercase alphanumerical words, removing stopwords.
+
+    Args:
+        text: Input string to tokenize.
+
+    Returns:
+        List of lowercase tokens without stopwords.
+
+    Examples:
+        >>> _tokenize("The quick brown fox")
+        ['quick', 'brown', 'fox']
+    """
     return [w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in _STOPWORDS]
 
 
 def _tfidf_vector(tokens: list[str], idf: dict[str, float]) -> dict[str, float]:
+    """Compute TF-IDF vector for a list of tokens.
+
+    Args:
+        tokens: List of tokenized words.
+        idf: Inverse document frequency dictionary.
+
+    Returns:
+        Dictionary mapping terms to TF-IDF scores.
+
+    Examples:
+        >>> idf = {"word": 1.5}
+        >>> _tfidf_vector(["word", "word"], idf)
+        {'word': 1.0}
+    """
     tf = Counter(tokens)
     n = len(tokens) or 1
     return {t: (cnt / n) * idf.get(t, 1.0) for t, cnt in tf.items()}
 
 
 def _cosine(a: dict[str, float], b: dict[str, float]) -> float:
+    """Compute cosine similarity between two sparse vectors.
+
+    Args:
+        a: First sparse vector as dict.
+        b: Second sparse vector as dict.
+
+    Returns:
+        Cosine similarity score between -1 and 1.
+
+    Examples:
+        >>> _cosine({"a": 1.0}, {"a": 1.0})
+        1.0
+        >>> _cosine({"a": 1.0}, {"a": 0.0, "b": 1.0})
+        0.0
+    """
     dot = sum(a.get(k, 0.0) * v for k, v in b.items())
     na = math.sqrt(sum(v * v for v in a.values())) or 1.0
     nb = math.sqrt(sum(v * v for v in b.values())) or 1.0
@@ -119,6 +160,21 @@ def _cosine(a: dict[str, float], b: dict[str, float]) -> float:
 
 
 def _cosine_dense(a: list[float], b: list[float]) -> float:
+    """Compute cosine similarity between two dense vectors.
+
+    Args:
+        a: First dense vector as list.
+        b: Second dense vector as list.
+
+    Returns:
+        Cosine similarity score between -1 and 1.
+
+    Examples:
+        >>> _cosine_dense([1.0, 0.0], [1.0, 0.0])
+        1.0
+        >>> _cosine_dense([1.0, 0.0], [0.0, 1.0])
+        0.0
+    """
     dot = sum(x * y for x, y in zip(a, b))
     na = math.sqrt(sum(x * x for x in a)) or 1.0
     nb = math.sqrt(sum(x * x for x in b)) or 1.0

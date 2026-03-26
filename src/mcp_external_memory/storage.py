@@ -53,6 +53,16 @@ class MemoryEntry:
     access_count: int = 0
 
     def to_dict(self) -> dict:
+        """Convert MemoryEntry to dictionary representation.
+
+        Returns:
+            Dictionary with all memory fields.
+
+        Examples:
+            >>> entry = MemoryEntry(id="123", content="test")
+            >>> entry.to_dict()["id"]
+            '123'
+        """
         return {
             "id": self.id,
             "content": self.content,
@@ -66,7 +76,14 @@ class MemoryEntry:
 
 
 class MemoryStore:
+    """SQLite-backed memory store with LZ4 compression."""
+
     def __init__(self, db_path: Path) -> None:
+        """Initialize memory store with database at given path.
+
+        Args:
+            db_path: Path to SQLite database file.
+        """
         db_path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(str(db_path), check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
@@ -74,6 +91,11 @@ class MemoryStore:
         self._conn.commit()
 
     def add(self, entry: MemoryEntry) -> None:
+        """Add or update a memory entry in the store.
+
+        Args:
+            entry: MemoryEntry to store.
+        """
         now = time.time()
         self._conn.execute(
             """INSERT INTO memories
@@ -99,6 +121,14 @@ class MemoryStore:
         self._conn.commit()
 
     def get(self, mem_id: str) -> MemoryEntry | None:
+        """Retrieve a memory entry by ID.
+
+        Args:
+            mem_id: Unique identifier of memory.
+
+        Returns:
+            MemoryEntry if found, None otherwise.
+        """
         row = self._conn.execute(
             "SELECT * FROM memories WHERE id=?", (mem_id,)
         ).fetchone()
@@ -129,6 +159,14 @@ class MemoryStore:
         self._conn.commit()
 
     def delete(self, mem_id: str) -> bool:
+        """Delete a memory entry by ID.
+
+        Args:
+            mem_id: Unique identifier of memory to delete.
+
+        Returns:
+            True if entry was deleted, False if not found.
+        """
         cur = self._conn.execute("DELETE FROM memories WHERE id=?", (mem_id,))
         self._conn.commit()
         return cur.rowcount > 0
@@ -140,6 +178,17 @@ class MemoryStore:
         limit: int = 50,
         offset: int = 0,
     ) -> list[MemoryEntry]:
+        """List memory entries with optional filtering.
+
+        Args:
+            namespace: Filter by namespace.
+            tags: Filter by tags (OR logic - returns entries with any matching tag).
+            limit: Maximum number of results.
+            offset: Number of results to skip (for pagination).
+
+        Returns:
+            List of matching MemoryEntry objects.
+        """
         query = "SELECT * FROM memories"
         params: list[object] = []
         clauses: list[str] = []
@@ -158,10 +207,20 @@ class MemoryStore:
         return results
 
     def all_texts(self) -> list[str]:
+        """Get all text content from stored memories.
+
+        Returns:
+            List of all memory content strings.
+        """
         rows = self._conn.execute("SELECT content FROM memories").fetchall()
         return [_decompress(r["content"]) for r in rows]
 
     def all_with_embeddings(self) -> list[tuple[str, list[float], MemoryEntry]]:
+        """Get all memories that have embeddings.
+
+        Returns:
+            List of tuples (id, embedding, MemoryEntry).
+        """
         rows = self._conn.execute("SELECT * FROM memories").fetchall()
         result: list[tuple[str, list[float], MemoryEntry]] = []
         for r in rows:
@@ -172,9 +231,19 @@ class MemoryStore:
         return result
 
     def count(self) -> int:
+        """Get total count of stored memories.
+
+        Returns:
+            Number of memory entries in store.
+        """
         return self._conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]  # type: ignore[no-any-return]
 
     def stats(self) -> dict[str, object]:
+        """Get statistics about the memory store.
+
+        Returns:
+            Dictionary with total_memories, namespaces dict, and db_path.
+        """
         total = self._conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
         ns = self._conn.execute(
             "SELECT namespace, COUNT(*) as c FROM memories GROUP BY namespace"

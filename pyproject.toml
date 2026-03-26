@@ -74,11 +74,12 @@ convention = "google"
 
 [tool.mypy]
 python_version = "3.11"
+strict = true
+src = ["src"]
+tests = ["tests"]
 warn_return_any = true
 warn_unused_ignores = true
 ignore_missing_imports = true
-no_implicit_optional = false
-warn_unreachable = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -90,7 +91,7 @@ source = ["src"]
 branch = true
 
 [tool.coverage.report]
-exclude = ["tests/*", "*/__init__.py"]
+exclude = ["tests/*", "*/__init__.py", "**/__main__.py"]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -98,4 +99,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
+    "async def memory_",  # MCP tool functions require FastMCP context
+    "class OpenAIEmbedder",  # requires OPENAI_API_KEY env var
+    "class OllamaEmbedder",  # requires Ollama server running
 ]
