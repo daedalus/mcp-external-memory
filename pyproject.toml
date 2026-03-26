@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "Daniel Clavijo", email = "dclavijo@example.com"}
+    {name = "Dario Clavijo", email = "clavijodario@gmail.com"}
 ]
 dependencies = [
     "mcp>=1.4.0",
@@ -47,9 +47,9 @@ cli = [
 mcp-external-memory = "mcp_external_memory.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/daedalus/mcp-external-memory"
-Repository = "https://github.com/daedalus/mcp-external-memory"
-Issues = "https://github.com/daedalus/mcp-external-memory/issues"
+Homepage = "https://github.com/dariocla/mcp-external-memory"
+Repository = "https://github.com/dariocla/mcp-external-memory"
+Issues = "https://github.com/dariocla/mcp-external-memory/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_external_memory"]

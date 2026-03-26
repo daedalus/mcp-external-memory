@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.daedalus/mcp-external-memory",
+  "name": "io.github.dariocla/mcp-external-memory",
   "description": "An MCP server that gives LLMs persistent, searchable semantic memory",
   "repository": {
-    "url": "https://github.com/daedalus/mcp-external-memory",
+    "url": "https://github.com/dariocla/mcp-external-memory",
     "source": "github"
   },
   "version": "0.1.0",
