@@ -11,13 +11,19 @@ from typing import Any
 
 import lz4.frame
 
+LZ4_MAGIC = b"\x04\x22\x4d\x18"
+
 
 def _compress(data: str) -> bytes:
     return lz4.frame.compress(data.encode("utf-8"))  # type: ignore[no-any-return]
 
 
 def _decompress(data: bytes) -> str:
-    return lz4.frame.decompress(data).decode("utf-8")  # type: ignore[no-any-return]
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    if data[:4] == LZ4_MAGIC:
+        return lz4.frame.decompress(data).decode("utf-8")  # type: ignore[no-any-return]
+    return data.decode("utf-8")
 
 
 DB_PATH = Path(os.environ.get("MEMORY_DB_PATH", "~/.semantic_memory.db")).expanduser()
