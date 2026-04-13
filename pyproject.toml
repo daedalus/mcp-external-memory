@@ -45,7 +45,7 @@ cli = [
 
 [project.scripts]
 mcp-external-memory = "mcp_external_memory.__main__:main"
-mcp-external-memory-install-skill = "install_skill:main"
+mcp-external-memory-install-skill = "scripts.install_skill:main"
 
 [project.urls]
 Homepage = "https://github.com/daedalus/mcp-external-memory"
@@ -56,7 +56,7 @@ Issues = "https://github.com/daedalus/mcp-external-memory/issues"
 packages = ["src/mcp_external_memory"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/mcp_external_memory", "skills", "install_skill.py"]
+include = ["src/mcp_external_memory", "skills", "scripts"]
 
 [tool.ruff]
 line-length = 88

@@ -15,7 +15,7 @@ AGENT_DIRECTORIES = {
 }
 
 SKILL_NAME = "external-memory"
-SOURCE_DIR = Path(__file__).parent / "skills" / SKILL_NAME
+SOURCE_DIR = Path(__file__).parent.parent / "skills" / SKILL_NAME
 
 
 def find_agent_dirs() -> dict[str, Path]:
